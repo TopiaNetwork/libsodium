@@ -15,8 +15,9 @@ Public domain.
 
 #ifndef HAVE_AMD64_ASM
 
+//Modified name for topia
 static int
-stream_ref(unsigned char *c, unsigned long long clen, const unsigned char *n,
+stream_ref_salsa20(unsigned char *c, unsigned long long clen, const unsigned char *n,
            const unsigned char *k)
 {
     unsigned char in[16];
@@ -60,8 +61,9 @@ stream_ref(unsigned char *c, unsigned long long clen, const unsigned char *n,
     return 0;
 }
 
+//Modified name for topia
 static int
-stream_ref_xor_ic(unsigned char *c, const unsigned char *m,
+stream_ref_xor_ic_salsa20(unsigned char *c, const unsigned char *m,
                   unsigned long long mlen, const unsigned char *n, uint64_t ic,
                   const unsigned char *k)
 {
@@ -113,8 +115,8 @@ stream_ref_xor_ic(unsigned char *c, const unsigned char *m,
 
 struct crypto_stream_salsa20_implementation
     crypto_stream_salsa20_ref_implementation = {
-        SODIUM_C99(.stream =) stream_ref,
-        SODIUM_C99(.stream_xor_ic =) stream_ref_xor_ic,
+        SODIUM_C99(.stream =) stream_ref_salsa20,
+        SODIUM_C99(.stream_xor_ic =) stream_ref_xor_ic_salsa20,
     };
 
 #endif
