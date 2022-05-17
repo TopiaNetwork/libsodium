@@ -63,6 +63,7 @@ int crypto_sign(unsigned char *sm, unsigned long long *smlen_p,
                 const unsigned char *m, unsigned long long mlen,
                 const unsigned char *sk) __attribute__ ((nonnull(1, 5)));
 
+//added for topia
 SODIUM_EXPORT
 int validate_ed25519_pk_and_sig(const unsigned char *sig, const unsigned char *pk)
             __attribute__ ((warn_unused_result)) __attribute__ ((nonnull(1, 2)));
@@ -73,6 +74,7 @@ int crypto_sign_open(unsigned char *m, unsigned long long *mlen_p,
                      const unsigned char *pk)
             __attribute__ ((warn_unused_result)) __attribute__ ((nonnull(3, 5)));
 
+//added for topia
 SODIUM_EXPORT
 int crypto_sign_ed25519_open_batch(const unsigned char **m, const unsigned long long *mlen, 
                                 const unsigned char **pk, const unsigned char **RS, 
@@ -91,6 +93,7 @@ int crypto_sign_verify_detached(const unsigned char *sig,
                                 const unsigned char *pk)
             __attribute__ ((warn_unused_result)) __attribute__ ((nonnull(1, 4)));
 
+//added for topia
 SODIUM_EXPORT
 int crypto_sign_bv_compatible_verify_detached(const unsigned char *sig,
                                 const unsigned char *m,
@@ -117,6 +120,7 @@ int crypto_sign_final_verify(crypto_sign_state *state, const unsigned char *sig,
                              const unsigned char *pk)
             __attribute__ ((warn_unused_result)) __attribute__ ((nonnull));
 
+//added for topia
 SODIUM_EXPORT
 int crypto_sign_final_bv_compatible_verify(crypto_sign_state *state, const unsigned char *sig,
                              const unsigned char *pk)

@@ -50,6 +50,7 @@ load_4(const unsigned char *in)
 # include "fe_25_5/fe.h"
 #endif
 
+//added for topia
 #ifdef HAVE_TI_MODE
 const ge25519_p3 ge25519_basepoint = 
 {
@@ -290,24 +291,6 @@ ge25519_add_cached(ge25519_p1p1 *r, const ge25519_p3 *p, const ge25519_cached *q
     fe25519_sub(r->T, t0, r->T);
 }
 
-void
-ge25519_add(ge25519_p1p1 *r, const ge25519_p3 *p, const ge25519_cached *q)
-{
-    fe25519 t0;
-
-    fe25519_add(r->X, p->Y, p->X);
-    fe25519_sub(r->Y, p->Y, p->X);
-    fe25519_mul(r->Z, r->X, q->YplusX);
-    fe25519_mul(r->Y, r->Y, q->YminusX);
-    fe25519_mul(r->T, q->T2d, p->T);
-    fe25519_mul(r->X, p->Z, q->Z);
-    fe25519_add(t0, r->X, r->X);
-    fe25519_sub(r->X, r->Z, r->Y);
-    fe25519_add(r->Y, r->Z, r->Y);
-    fe25519_add(r->Z, t0, r->T);
-    fe25519_sub(r->T, t0, r->T);
-}
-
 static void
 slide_vartime(signed char *r, const unsigned char *a)
 {
@@ -434,54 +417,6 @@ ge25519_frombytes_negate_vartime(ge25519_p3 *h, const unsigned char *s)
     return 0;
 }
 
-// ge25519_frombytes_vartime tries to decode a given a 32-octet string.
-// to a point on the curve. it is identical to ge25519_frombytes_negate_vartime except
-// that this function does not negate the returned value.
-int
-ge25519_frombytes_vartime(ge25519_p3 *h, const unsigned char *s)
-{
-    fe25519 u;
-    fe25519 v;
-    fe25519 v3;
-    fe25519 vxx;
-    fe25519 m_root_check, p_root_check;
-
-    fe25519_frombytes(h->Y, s);
-    fe25519_1(h->Z);
-    fe25519_sq(u, h->Y);
-    fe25519_mul(v, u, ed25519_d);
-    fe25519_sub(u, u, h->Z); /* u = y^2-1 */
-    fe25519_add(v, v, h->Z); /* v = dy^2+1 */
-
-    fe25519_sq(v3, v);
-    fe25519_mul(v3, v3, v); /* v3 = v^3 */
-    fe25519_sq(h->X, v3);
-    fe25519_mul(h->X, h->X, v);
-    fe25519_mul(h->X, h->X, u); /* x = uv^7 */
-
-    fe25519_pow22523(h->X, h->X); /* x = (uv^7)^((q-5)/8) */
-    fe25519_mul(h->X, h->X, v3);
-    fe25519_mul(h->X, h->X, u); /* x = uv^3(uv^7)^((q-5)/8) */
-
-    fe25519_sq(vxx, h->X);
-    fe25519_mul(vxx, vxx, v);
-    fe25519_sub(m_root_check, vxx, u); /* vx^2-u */
-    if (fe25519_iszero(m_root_check) == 0) {
-        fe25519_add(p_root_check, vxx, u); /* vx^2+u */
-        if (fe25519_iszero(p_root_check) == 0) {
-            return -1;
-        }
-        fe25519_mul(h->X, h->X, fe25519_sqrtm1);
-    }
-
-    if (fe25519_isnegative(h->X) ^ (s[31] >> 7)) {
-        fe25519_neg(h->X, h->X);
-    }
-    fe25519_mul(h->T, h->X, h->Y);
-
-    return 0;
-}
-
 /*
  r = p + q
  */
@@ -509,48 +444,6 @@ ge25519_add_precomp(ge25519_p1p1 *r, const ge25519_p3 *p, const ge25519_precomp 
 
 static void
 ge25519_sub_precomp(ge25519_p1p1 *r, const ge25519_p3 *p, const ge25519_precomp *q)
-{
-    fe25519 t0;
-
-    fe25519_add(r->X, p->Y, p->X);
-    fe25519_sub(r->Y, p->Y, p->X);
-    fe25519_mul(r->Z, r->X, q->yminusx);
-    fe25519_mul(r->Y, r->Y, q->yplusx);
-    fe25519_mul(r->T, q->xy2d, p->T);
-    fe25519_add(t0, p->Z, p->Z);
-    fe25519_sub(r->X, r->Z, r->Y);
-    fe25519_add(r->Y, r->Z, r->Y);
-    fe25519_sub(r->Z, t0, r->T);
-    fe25519_add(r->T, t0, r->T);
-}
-
-/*
- r = p + q
- */
-
-static void
-ge25519_madd(ge25519_p1p1 *r, const ge25519_p3 *p, const ge25519_precomp *q)
-{
-    fe25519 t0;
-
-    fe25519_add(r->X, p->Y, p->X);
-    fe25519_sub(r->Y, p->Y, p->X);
-    fe25519_mul(r->Z, r->X, q->yplusx);
-    fe25519_mul(r->Y, r->Y, q->yminusx);
-    fe25519_mul(r->T, q->xy2d, p->T);
-    fe25519_add(t0, p->Z, p->Z);
-    fe25519_sub(r->X, r->Z, r->Y);
-    fe25519_add(r->Y, r->Z, r->Y);
-    fe25519_add(r->Z, t0, r->T);
-    fe25519_sub(r->T, t0, r->T);
-}
-
-/*
- r = p - q
- */
-
-static void
-ge25519_msub(ge25519_p1p1 *r, const ge25519_p3 *p, const ge25519_precomp *q)
 {
     fe25519 t0;
 
@@ -836,24 +729,6 @@ ge25519_sub_cached(ge25519_p1p1 *r, const ge25519_p3 *p, const ge25519_cached *q
 }
 
 void
-ge25519_sub(ge25519_p1p1 *r, const ge25519_p3 *p, const ge25519_cached *q)
-{
-    fe25519 t0;
-
-    fe25519_add(r->X, p->Y, p->X);
-    fe25519_sub(r->Y, p->Y, p->X);
-    fe25519_mul(r->Z, r->X, q->YminusX);
-    fe25519_mul(r->Y, r->Y, q->YplusX);
-    fe25519_mul(r->T, q->T2d, p->T);
-    fe25519_mul(r->X, p->Z, q->Z);
-    fe25519_add(t0, r->X, r->X);
-    fe25519_sub(r->X, r->Z, r->Y);
-    fe25519_add(r->Y, r->Z, r->Y);
-    fe25519_sub(r->Z, t0, r->T);
-    fe25519_add(r->T, t0, r->T);
-}
-
-void
 ge25519_tobytes(unsigned char *s, const ge25519_p2 *h)
 {
     fe25519 recip;
@@ -962,6 +837,7 @@ ge25519_double_scalarmult_vartime(ge25519_p2 *r, const unsigned char *a,
     }
 }
 
+//added for topia
 /*
  r = a * A + b * B
  where a = a[0]+256*a[1]+...+256^31 a[31].
@@ -997,31 +873,31 @@ ge25519_double_scalarmult_vartime_p3(ge25519_p3 *r, const unsigned char *a,
     ge25519_p3_dbl(&t, A);
     ge25519_p1p1_to_p3(&A2, &t);
 
-    ge25519_add(&t, &A2, &Ai[0]);
+    ge25519_add_cached(&t, &A2, &Ai[0]);
     ge25519_p1p1_to_p3(&u, &t);
     ge25519_p3_to_cached(&Ai[1], &u);
 
-    ge25519_add(&t, &A2, &Ai[1]);
+    ge25519_add_cached(&t, &A2, &Ai[1]);
     ge25519_p1p1_to_p3(&u, &t);
     ge25519_p3_to_cached(&Ai[2], &u);
 
-    ge25519_add(&t, &A2, &Ai[2]);
+    ge25519_add_cached(&t, &A2, &Ai[2]);
     ge25519_p1p1_to_p3(&u, &t);
     ge25519_p3_to_cached(&Ai[3], &u);
 
-    ge25519_add(&t, &A2, &Ai[3]);
+    ge25519_add_cached(&t, &A2, &Ai[3]);
     ge25519_p1p1_to_p3(&u, &t);
     ge25519_p3_to_cached(&Ai[4], &u);
 
-    ge25519_add(&t, &A2, &Ai[4]);
+    ge25519_add_cached(&t, &A2, &Ai[4]);
     ge25519_p1p1_to_p3(&u, &t);
     ge25519_p3_to_cached(&Ai[5], &u);
 
-    ge25519_add(&t, &A2, &Ai[5]);
+    ge25519_add_cached(&t, &A2, &Ai[5]);
     ge25519_p1p1_to_p3(&u, &t);
     ge25519_p3_to_cached(&Ai[6], &u);
 
-    ge25519_add(&t, &A2, &Ai[6]);
+    ge25519_add_cached(&t, &A2, &Ai[6]);
     ge25519_p1p1_to_p3(&u, &t);
     ge25519_p3_to_cached(&Ai[7], &u);
 
@@ -1038,18 +914,18 @@ ge25519_double_scalarmult_vartime_p3(ge25519_p3 *r, const unsigned char *a,
 
         if (aslide[i] > 0) {
             ge25519_p1p1_to_p3(&u, &t);
-            ge25519_add(&t, &u, &Ai[aslide[i] / 2]);
+            ge25519_add_cached(&t, &u, &Ai[aslide[i] / 2]);
         } else if (aslide[i] < 0) {
             ge25519_p1p1_to_p3(&u, &t);
-            ge25519_sub(&t, &u, &Ai[(-aslide[i]) / 2]);
+            ge25519_sub_cached(&t, &u, &Ai[(-aslide[i]) / 2]);
         }
 
         if (bslide[i] > 0) {
             ge25519_p1p1_to_p3(&u, &t);
-            ge25519_madd(&t, &u, &Bi[bslide[i] / 2]);
+            ge25519_add_precomp(&t, &u, &Bi[bslide[i] / 2]);
         } else if (bslide[i] < 0) {
             ge25519_p1p1_to_p3(&u, &t);
-            ge25519_msub(&t, &u, &Bi[(-bslide[i]) / 2]);
+            ge25519_sub_precomp(&t, &u, &Bi[(-bslide[i]) / 2]);
         }
 
         ge25519_p1p1_to_p3(r, &t);
@@ -1249,10 +1125,12 @@ ge25519_p3_dbladd(ge25519_p3 *r, const int n, const ge25519_p3 *q)
     ge25519_p3_add(r, r, q);
 }
 
+//added for topia
 /*
  * r = 8 * p
  */
-void ge25519_mul_by_cofactor(ge25519_p3* p_out, const ge25519_p3* p_in)
+void
+ge25519_mul_by_cofactor(ge25519_p3* p_out, const ge25519_p3* p_in)
 {
     ge25519_p1p1 tempP;
     ge25519_p2 tempP2;
@@ -1351,6 +1229,7 @@ ge25519_is_on_main_subgroup(const ge25519_p3 *p)
     return fe25519_iszero(pl.X);
 }
 
+//added for topia
 int
 ge25519_is_canonical_vartime(const unsigned char *s)
 {
@@ -1393,7 +1272,9 @@ ge25519_is_canonical(const unsigned char *s)
     return 1 - (c & d & 1);
 }
 
-int ge25519_is_neutral_vartime(const ge25519_p3 *p) {
+//added for topia
+int
+ge25519_is_neutral_vartime(const ge25519_p3 *p) {
 	static const unsigned char zero[32] = {0};
 	unsigned char point_buffer[3][32];
 	fe25519_tobytes(point_buffer[0], p->X);
@@ -3262,6 +3143,7 @@ ristretto255_from_hash(unsigned char s[32], const unsigned char h[64])
     ristretto255_p3_tobytes(s, &p);
 }
 
+//added for topia
 int
 sc25519_is_canonical_vartime(const unsigned char s[32])
 {

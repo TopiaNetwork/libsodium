@@ -1,3 +1,5 @@
+/*added for topia*/
+
 #include <limits.h>
 #include <stdint.h>
 #include <string.h>
@@ -59,7 +61,7 @@ _crypto_sign_ed25519_bv_compatible_verify_detached(const unsigned char *sig,
     if (ge25519_frombytes_negate_vartime(&A, pk) != 0) {
         return -1;
     }
-    if (ge25519_frombytes_vartime(&Rsig, sig) != 0) {
+    if (ge25519_frombytes_negate_vartime(&Rsig, sig) != 0) {
         return -1;
     }
     _crypto_sign_ed25519_ref10_hinit(&hs, prehashed);
@@ -74,7 +76,7 @@ _crypto_sign_ed25519_bv_compatible_verify_detached(const unsigned char *sig,
 
      // R calculated - R signature
     ge25519_p3_to_cached(&cached, &Rsig);
-    ge25519_sub(&tempR, &Rcalc, &cached);
+    ge25519_sub_cached(&tempR, &Rcalc, &cached);
     ge25519_p1p1_to_p3(&Rsub, &tempR);
 
     

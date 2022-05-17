@@ -66,6 +66,7 @@ int crypto_sign_ed25519_verify_detached(const unsigned char *sig,
                                         const unsigned char *pk)
             __attribute__ ((warn_unused_result)) __attribute__ ((nonnull(1, 4)));
 
+//added for topia
 SODIUM_EXPORT
 int crypto_sign_ed25519_bv_compatible_verify_detached(const unsigned char *sig,
                                         const unsigned char *m,
@@ -124,6 +125,7 @@ int crypto_sign_ed25519ph_final_verify(crypto_sign_ed25519ph_state *state,
                                        const unsigned char *pk)
             __attribute__ ((warn_unused_result)) __attribute__ ((nonnull));
 
+//added for topia
 SODIUM_EXPORT
 int crypto_sign_ed25519ph_final_bv_compatible_verify(crypto_sign_ed25519ph_state *state,
                                        const unsigned char *sig,

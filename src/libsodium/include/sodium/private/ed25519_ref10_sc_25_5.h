@@ -1,3 +1,5 @@
+/*added for topia*/
+
 #ifndef ed25519_ref10_sc_25_5_H
 #define ed25519_ref10_sc_25_5_H
 

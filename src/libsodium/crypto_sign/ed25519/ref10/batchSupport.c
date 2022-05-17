@@ -1,3 +1,5 @@
+/*added for topia*/
+
 #include "crypto_hash_sha512.h"
 #include "sign_ed25519_ref10.h"
 #include "private/ed25519_ref10.h"
@@ -148,7 +150,7 @@ void ge25519_multi_scalarmult_vartime_final(ge25519_p3 *r, ge25519_p3 *point, sc
         ge25519_p1p1_to_p3(r, &p1p1_r);
         if (scalar[limb] & flag) 
         {
-            ge25519_add(&p1p1_r, r, &cache_r);
+            ge25519_add_cached(&p1p1_r, r, &cache_r);
             ge25519_p1p1_to_p3(r,&p1p1_r);
         }
 
@@ -198,7 +200,7 @@ ge25519_multi_scalarmult_vartime(ge25519_p3 *r, batch_heap *heap, size_t count) 
         sub256_modm_batch(heap->scalars[max1], heap->scalars[max1], heap->scalars[max2], limbsize);
         ge25519_p3_to_cached(&cached_p,&heap->points[max1]);
 
-        ge25519_add(&p_as_p1p1, &heap->points[max2], &cached_p);
+        ge25519_add_cached(&p_as_p1p1, &heap->points[max2], &cached_p);
         ge25519_p1p1_to_p3(&heap->points[max2], &p_as_p1p1);
         heap_updated_root(heap, limbsize);
     }
