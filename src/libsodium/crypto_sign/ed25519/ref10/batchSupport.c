@@ -209,6 +209,7 @@ ge25519_multi_scalarmult_vartime(ge25519_p3 *r, batch_heap *heap, size_t count) 
 }
 
 /*
+* Copyright(c) is owned by the Algorand team.
 * verifies ed25519 signatures in  batch. The algorithm is based on https://github.com/floodyberry/ed25519-donna 
 * implemention. we changed the algorithm according to https://eprint.iacr.org/2020/1244.pdf .
 * the batch size is between 2 and 64 signatures per batch. 
