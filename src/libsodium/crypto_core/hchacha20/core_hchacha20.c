@@ -5,7 +5,8 @@
 #include "crypto_core_hchacha20.h"
 #include "private/common.h"
 
-#define QUARTERROUND(A, B, C, D)     \
+//edit for topia
+#define QUARTERROUND_hchacha20(A, B, C, D)     \
   do {                               \
       A += B; D = ROTL32(D ^ A, 16); \
       C += D; B = ROTL32(B ^ C, 12); \
@@ -46,14 +47,14 @@ crypto_core_hchacha20(unsigned char *out, const unsigned char *in,
     x15 = LOAD32_LE(in + 12);
 
     for (i = 0; i < 10; i++) {
-        QUARTERROUND(x0, x4,  x8, x12);
-        QUARTERROUND(x1, x5,  x9, x13);
-        QUARTERROUND(x2, x6, x10, x14);
-        QUARTERROUND(x3, x7, x11, x15);
-        QUARTERROUND(x0, x5, x10, x15);
-        QUARTERROUND(x1, x6, x11, x12);
-        QUARTERROUND(x2, x7,  x8, x13);
-        QUARTERROUND(x3, x4,  x9, x14);
+        QUARTERROUND_hchacha20(x0, x4,  x8, x12);
+        QUARTERROUND_hchacha20(x1, x5,  x9, x13);
+        QUARTERROUND_hchacha20(x2, x6, x10, x14);
+        QUARTERROUND_hchacha20(x3, x7, x11, x15);
+        QUARTERROUND_hchacha20(x0, x5, x10, x15);
+        QUARTERROUND_hchacha20(x1, x6, x11, x12);
+        QUARTERROUND_hchacha20(x2, x7,  x8, x13);
+        QUARTERROUND_hchacha20(x3, x4,  x9, x14);
     }
 
     STORE32_LE(out +  0, x0);
